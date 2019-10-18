@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+  # Add Redis Image
+  redis:
+    image: "redis:alpine"
+    container_name: cache_redis
+    ports:
+      - "6379:6379"
+    networks: 
+      - web
+
+  # Add Apache server
+  apache:
+    build: ./docker/build/apache
+    ports:
+      - "8000:80"
+    depends_on:
+      - mysql
+      - redis
+    links:
+      - redis
+    environment:
+      - REDIS_URL=redis://cache_redis
+    volumes:
+      - ./docker/etc/apache/virtualhost.conf:/etc/apache2/sites-enabled/000-default.conf:ro
+      - ./docker/etc/php/php.ini:/usr/local/etc/php/php.ini
+      - ./docker/etc/php/php-cli.ini:/usr/local/etc/php/php-cli.ini
+      - ./app/symfony:/var/www/symfony
+    networks: 
+      - web
+  
+  # Add Mysql image
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - ./docker/etc/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./data:/data
+    environment:
+      MYSQL_ROOT_PASSWORD: azerty
+      MYSQL_DATABASE: dbase
+  
+  # PhpMyAdmin Image    
+  phpmyadmin:
+    ports:
+      - "8001:80"
+    image: nazarpc/phpmyadmin
+    depends_on:
+      - mysql
+networks:
+  web:
