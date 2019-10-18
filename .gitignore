@@ -4,6 +4,10 @@
 !app/cache/.gitkeep
 !app/logs/.gitkeep
 
+# env
+.env
+/app/symfony/.env
+
 # Email spool folder
 /app/spool/*
 
@@ -37,6 +41,10 @@
 
 # Build data
 /build/
+
+# PhpStorm
+.idea/
+/app/symfony/.idea/
 
 # Composer PHAR
 /composer.phar
